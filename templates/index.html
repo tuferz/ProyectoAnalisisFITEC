@@ -2,32 +2,94 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Análisis de Regresión FITEC</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; margin: 2em; background-color: #f9f9f9; color: #333; }
-        h1 { color: #005A9C; }
-        .container { max-width: 800px; margin: auto; background-color: white; padding: 2em; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .ecuacion { background-color: #e7f3ff; border-left: 5px solid #005A9C; padding: 1.5em; margin: 1.5em 0; font-size: 1.4em; font-family: monospace; }
-        .interpretacion p { line-height: 1.6; }
+        body { background-color: #f8f9fa; }
+        .ecuacion { font-family: monospace; font-size: 1.25rem; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Resultados del Modelo de Regresión Simple</h1>
-        <h2>Predicción del Total de Ingresos Anuales</h2>
+    <div class="container mt-5">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h1 class="h3 mb-0">Dashboard de Análisis Poblacional FITEC</h1>
+            </div>
+            <div class="card-body">
+                <h2 class="h4 card-title">Modelo de Regresión Simple: Ingresos Anuales</h2>
+                <p class="card-text">Este modelo analiza la tendencia del número total de estudiantes que ingresan a la facultad cada año.</p>
 
-        <p>La ecuación matemática que modela la tendencia de los ingresos a lo largo del tiempo es:</p>
-
-        <!-- Aquí usamos los marcadores de Jinja2 para insertar los datos de Python -->
-        <div class="ecuacion">
-            {{ ecuacion }}
-        </div>
-
-        <div class="interpretacion">
-            <h3>Interpretación de los Coeficientes:</h3>
-            <p><strong>Intercepto (β₀) = {{ beta0 }}</strong>: Es el punto de partida teórico de la línea.</p>
-            <p><strong>Pendiente (β₁) = {{ beta1 }}</strong>: Indica que, en promedio, el número total de ingresos ha <strong>cambiado en aproximadamente {{ beta1 }} alumnos cada año</strong>.</p>
+                <div class="row mt-4 align-items-center">
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title">Ecuación del Modelo</h5>
+                                <p class="ecuacion text-primary fw-bold">Y = {{ beta0 }} + {{ beta1 }} * X</p>
+                                <hr>
+                                <h6 class="card-subtitle mb-2 text-muted">Interpretación</h6>
+                                <p class="small"><strong>Pendiente (β₁):</strong> Por cada año que pasa, el número total de ingresos cambia, en promedio, en <strong>{{ beta1 }}</strong> estudiantes.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <canvas id="regressionChart"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
+    <script>
+        const anios = {{ anios_json | tojson }};
+        const ingresosReales = {{ ingresos_reales_json | tojson }};
+        const ingresosPredichos = {{ ingresos_predichos_json | tojson }};
+
+        const ctx = document.getElementById('regressionChart').getContext('2d');
+        const regressionChart = new Chart(ctx, {
+            type: 'scatter', // Tipo base de la gráfica
+            data: {
+                labels: anios,
+                datasets: [
+                    {
+                        label: 'Ingresos Reales',
+                        data: ingresosReales,
+                        backgroundColor: 'rgba(0, 90, 156, 0.6)', // Puntos azules
+                        type: 'scatter', // Puntos de dispersión
+                        pointRadius: 6,
+                    },
+                    {
+                        label: 'Línea de Regresión (Predicción)',
+                        data: ingresosPredichos,
+                        borderColor: 'rgba(255, 99, 132, 1)', // Línea roja
+                        type: 'line', // Tipo línea
+                        fill: false,
+                        tension: 0.1,
+                        pointRadius: 0, // No mostrar puntos en la línea
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Año'
+                        }
+                    },
+
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Total de Ingresos'
+                        },
+                        beginAtZero: false
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>
+
