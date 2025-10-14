@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard FITEC</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; color: #23272a; }
+        .hero { padding: 4rem 0; }
+        .card-link { text-decoration: none; color: inherit; }
+        .card-anim {
+            transition: transform 0.2s cubic-bezier(.4,0,.2,1), box-shadow 0.2s cubic-bezier(.4,0,.2,1);
+        }
+        .card-link:hover .card-anim {
+            transform: scale(1.05);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+        .card-link.disabled:hover .card-anim {
+            transform: none;
+            box-shadow: none;
+        }
+        .navbar, .card-header { background-color: #0d6efd !important; }
+        .navbar-brand { color: #fff !important; }
+        .card { background-color: #fff; color: #23272a; }
+        .card-title, .card-text { color: #23272a; }
+        .btn-outline-primary { border-color: #0d6efd; color: #0d6efd; }
+        .btn-outline-primary:hover { background-color: #0d6efd; color: #fff; }
+        .bg-light { background-color: #f8f9fa !important; }
+        .text-muted { color: #6c757d !important; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">FITEC Analytics</a>
+        </div>
+    </nav>
+    <section class="hero text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold">Análisis estadístico FITEC</h1>
+            <p class="lead">Explora modelos estadísticos y matemáticos para analizar tendencias y estimar el comportamiento poblacional de la facultad.</p>
+        </div>
+    </section>
+    <div class="container mb-5">
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <a href="/regresion_simple" class="card-link">
+                    <div class="card shadow-sm h-100 card-anim">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Regresión Simple</h5>
+                            <p class="card-text">Analiza la tendencia de ingresos anuales de estudiantes.</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <a href="#" class="card-link disabled">
+                    <div class="card shadow-sm h-100 card-anim">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Regresión Múltiple</h5>
+                            <p class="card-text">Predice variables usando múltiples factores. (Próximamente)</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <a href="#" class="card-link disabled">
+                    <div class="card shadow-sm h-100 card-anim">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Series de Tiempo</h5>
+                            <p class="card-text">Analiza patrones y pronósticos temporales. (Próximamente)</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <a href="#" class="card-link disabled">
+                    <div class="card shadow-sm h-100 card-anim">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Modelo EDO</h5>
+                            <p class="card-text">Estima el crecimiento poblacional con ecuaciones diferenciales. (Próximamente)</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <footer class="bg-light py-3 mt-auto">
+        <div class="container text-center">
+            <span class="text-muted">&copy; 2025 Tech Synergy</span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -10,6 +10,10 @@ connection_string = f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={SERVER};D
 
 
 @app.route('/')
+def landing():
+    return render_template('landing.html')
+
+@app.route('/regresion_simple')
 def dashboard_regresion_ingresos():
     try:
         cnxn = pyodbc.connect(connection_string)
@@ -38,7 +42,7 @@ def dashboard_regresion_ingresos():
         ingresos_predichos = linea_prediccion.tolist()
 
         return render_template(
-            'index.html',
+            'regresion_simple.html',
             beta0=f"{beta_0:.2f}",
             beta1=f"{beta_1:.2f}",
             anios_json=anios,
