@@ -28,8 +28,8 @@
                 <h1 class="h3 mb-0">Regresión Simple</h1>
             </div>
             <div class="card-body">
-                <h2 class="h4 card-title">Ingresos Anuales</h2>
-                <p class="card-text">Este modelo analiza la tendencia del número total de estudiantes que ingresan a la facultad cada año.</p>
+                <h2 class="h4 card-title">{{ titulo }}</h2>
+                <p class="card-text">{{ descripcion }}</p>
 
                 <div class="row d-flex align-items-center mt-4">
                     <div class="col-md-4 d-flex align-items-center">
@@ -53,8 +53,8 @@
 
     <script>
         const anios = {{ anios_json | tojson }};
-        const ingresosReales = {{ ingresos_reales_json | tojson }};
-        const ingresosPredichos = {{ ingresos_predichos_json | tojson }};
+        const reales = {{ reales_json | tojson }};
+        const predichos = {{ predichos_json | tojson }};
 
         const ctx = document.getElementById('regressionChart').getContext('2d');
         const regressionChart = new Chart(ctx, {
@@ -63,15 +63,15 @@
                 labels: anios,
                 datasets: [
                     {
-                        label: 'Ingresos Reales',
-                        data: ingresosReales,
+                        label: 'Reales',
+                        data: reales,
                         backgroundColor: 'rgba(0, 90, 156, 0.6)', // Puntos azules
                         type: 'scatter', // Puntos de dispersión
                         pointRadius: 6,
                     },
                     {
-                        label: 'Línea de Regresión (Predicción)',
-                        data: ingresosPredichos,
+                        label: 'Predichos',
+                        data: predichos,
                         borderColor: 'rgba(255, 99, 132, 1)', // Línea roja
                         type: 'line', // Tipo línea
                         fill: false,

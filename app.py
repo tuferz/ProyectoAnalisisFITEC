@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import pandas as pd
 import pyodbc
 from sklearn.linear_model import LinearRegression
@@ -14,20 +14,34 @@ def landing():
     return render_template('landing.html')
 
 @app.route('/regresion_simple')
-def dashboard_regresion_ingresos():
+def dashboard_regresion_simple():
+    tabla = request.args.get('tabla', 'Ingresos')
     try:
         cnxn = pyodbc.connect(connection_string)
-        sql_query = """
-                    SELECT Anio,(ISNULL(IIS, 0) + ISNULL(ISC, 0) + ISNULL(IETE, 0) + ISNULL(IGTI, 0) + ISNULL(ITIC, 0) + ISNULL(LASC, 0)) AS TotalIngresos
-                    FROM Ingresos
-                    ORDER BY Anio;
-                    """
-        df_ingresos = pd.read_sql(sql_query, cnxn)
+        if tabla == 'Ingresos':
+            sql_query = """
+                SELECT Anio,(ISNULL(IIS, 0) + ISNULL(ISC, 0) + ISNULL(IETE, 0) + ISNULL(IGTI, 0) + ISNULL(ITIC, 0) + ISNULL(LASC, 0)) AS TotalIngresos
+                FROM Ingresos
+                ORDER BY Anio;
+            """
+            titulo = "Ingresos Anuales"
+            descripcion = "Este modelo analiza la tendencia del número total de estudiantes que ingresan a la facultad cada año."
+        elif tabla == 'Egresos':
+            sql_query = """
+                SELECT Anio,(ISNULL(IIS, 0) + ISNULL(ISC, 0) + ISNULL(IETE, 0) + ISNULL(IGTI, 0) + ISNULL(ITIC, 0) + ISNULL(LASC, 0)) AS TotalIngresos
+                FROM Egresos
+                ORDER BY Anio;
+            """
+            titulo = "Egresos Anuales"
+            descripcion = "Este modelo analiza la tendencia del número total de estudiantes que egresan de la facultad cada año."
+        else:
+            return "<h1>Tabla no válida!</h1>"
+        df = pd.read_sql(sql_query, cnxn)
         cnxn.close()
 
-        df_ingresos = df_ingresos[df_ingresos['TotalIngresos'] > 0]
-        X = df_ingresos['Anio'].values.reshape(-1, 1)
-        Y = df_ingresos['TotalIngresos'].values
+        df = df[df['TotalIngresos'] > 0]
+        X = df['Anio'].values.reshape(-1, 1)
+        Y = df['TotalIngresos'].values
 
         modelo = LinearRegression()
         modelo.fit(X, Y)
@@ -37,22 +51,25 @@ def dashboard_regresion_ingresos():
 
         linea_prediccion = modelo.predict(X)
 
-        anios = df_ingresos['Anio'].tolist()
-        ingresos_reales = df_ingresos['TotalIngresos'].tolist()
-        ingresos_predichos = linea_prediccion.tolist()
+        anios = df['Anio'].tolist()
+        reales = df['TotalIngresos'].tolist()
+        predichos = linea_prediccion.tolist()
 
         return render_template(
             'regresion_simple.html',
             beta0=f"{beta_0:.2f}",
             beta1=f"{beta_1:.2f}",
             anios_json=anios,
-            ingresos_reales_json=ingresos_reales,
-            ingresos_predichos_json=ingresos_predichos
+            reales_json=reales,
+            predichos_json=predichos,
+            titulo=titulo,
+            descripcion=descripcion
         )
 
     except Exception as e:
         return f"<h1>Ocurrió un error en la aplicación</h1><p><strong>Detalle:</strong> {e}</p>"
 
 
+# @app.route('/regresion_multiple')
 if __name__ == '__main__':
     app.run(debug=True)
