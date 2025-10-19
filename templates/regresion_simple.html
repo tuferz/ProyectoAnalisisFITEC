@@ -16,6 +16,9 @@
         .card-ecuacion { background-color: #f8f9fa !important; color: #23272a !important; }
         .card-ecuacion .card-title, .card-ecuacion .ecuacion { color: #23272a !important; }
         .card-ecuacion .text-muted { color: #6c757d !important; }
+        /* Mejoras visuales para r y R² */
+        .stats-row { gap: .5rem; display: flex; flex-wrap: wrap; align-items: center; }
+        .stat-badge { font-size: .95rem; padding: .45rem .6rem; }
     </style>
 </head>
 <body>
@@ -40,6 +43,18 @@
                                 <hr>
                                 <h6 class="card-subtitle mb-2 text-muted">Interpretación:</h6>
                                 <p class="small"><strong>Pendiente (β₁):</strong> Por cada año que pasa, el número total de ingresos cambia, en promedio, en <strong>{{ beta1 }}</strong> estudiantes.</p>
+
+                                <!-- r y R² como badges con mejor presentación -->
+                                <div class="d-flex flex-wrap stats-row mt-2">
+                                    <span class="badge text-bg-info stat-badge">
+                                        R = <strong>
+                                            {% if r == 'NA' %}NA{% else %}{{ "%.4f"|format(r|float) }}{% endif %}
+                                        </strong>
+                                    </span>
+                                    <span class="badge text-bg-success stat-badge">
+                                        R<sup>2</sup> = <strong>{{ "%.4f"|format(r2|float) }}</strong>
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -88,8 +103,7 @@
                             text: 'Año'
                         },
                         ticks: {
-                            callback: function(value, index, values) {
-                                // Mostrar el año como string sin formato
+                            callback: function(value) {
                                 return String(value);
                             }
                         }
