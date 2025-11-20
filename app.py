@@ -131,7 +131,76 @@ def mostrar_tabla():
     except Exception as e:
         return f"<h1>Ocurrió un error al obtener la tabla</h1><p><strong>Detalle:</strong> {e}</p>"
 
+@app.route('/promedio_movil')
+def promedio_movil():
+    # Parámetros
+    tabla = request.args.get('tabla', 'Ingresos')
+    ventana_str = request.args.get('ventana', '3')
 
-# @app.route('/regresion_multiple')
+    # Validar ventana
+    try:
+        ventana = int(ventana_str)
+    except Exception:
+        ventana = 3
+    if ventana < 2:
+        ventana = 2
+
+    try:
+        cnxn = pyodbc.connect(connection_string)
+        if tabla == 'Ingresos':
+            sql_query = """
+                SELECT Anio,
+                       (ISNULL(IIS, 0) + ISNULL(ISC, 0) + ISNULL(IETE, 0) + ISNULL(IGTI, 0) + ISNULL(ITIC, 0) + ISNULL(LASC, 0)) AS Total
+                FROM Ingresos
+                ORDER BY Anio;
+            """
+            titulo = 'Promedio móvil - Ingresos'
+            descripcion = 'Suavizado de la serie de estudiantes que ingresan por año usando promedio móvil no centrado.'
+        elif tabla == 'Egresos':
+            sql_query = """
+                SELECT Anio,
+                       (ISNULL(IIS, 0) + ISNULL(ISC, 0) + ISNULL(IETE, 0) + ISNULL(IGTI, 0) + ISNULL(ITIC, 0) + ISNULL(LASC, 0)) AS Total
+                FROM Egresos
+                ORDER BY Anio;
+            """
+            titulo = 'Promedio móvil - Egresos'
+            descripcion = 'Suavizado de la serie de estudiantes que egresan por año usando promedio móvil no centrado.'
+        else:
+            return "<h1>Tabla no válida!</h1>"
+
+        df = pd.read_sql(sql_query, cnxn)
+        cnxn.close()
+
+        df = df[df['Total'] > 0].copy()
+
+        if not df.empty:
+            ventana = min(ventana, len(df))
+            df['PromedioMovil'] = df['Total'].rolling(window=ventana, min_periods=ventana).mean()
+        else:
+            df['PromedioMovil'] = df.get('Total')
+
+        anios = df['Anio'].tolist()
+        reales = df['Total'].tolist()
+        ma = [x if pd.notna(x) else None for x in df['PromedioMovil'].tolist()]
+
+        n_obs = int(len(df))
+        n_ma = int(pd.Series(ma).count())
+
+        return render_template(
+            'promedio_movil.html',
+            titulo=titulo,
+            descripcion=descripcion,
+            tabla=tabla,
+            ventana=ventana,
+            anios_json=anios,
+            reales_json=reales,
+            ma_json=ma,
+            n_obs=n_obs,
+            n_ma=n_ma
+        )
+
+    except Exception as e:
+        return f"<h1>Ocurrió un error al calcular el promedio móvil</h1><p><strong>Detalle:</strong> {e}</p>"
+
 if __name__ == '__main__':
     app.run(debug=True)

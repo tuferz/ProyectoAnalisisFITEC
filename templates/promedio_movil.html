@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Promedio móvil</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background-color: #f8f9fa; color: #23272a; }
+        .card, .card-header { background-color: #fff; color: #23272a; }
+        .card-header.bg-primary { background-color: #0d6efd !important; color: #fff !important; }
+        .btn-outline-primary { border-color: #0d6efd; color: #0d6efd; }
+        .btn-outline-primary:hover { background-color: #0d6efd; color: #fff; }
+        .form-inline .form-control { width: auto; display: inline-block; }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <a href="/" class="btn btn-outline-primary mb-3">&larr; Volver al inicio</a>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h1 class="h3 mb-0">Promedio móvil</h1>
+            <div>
+                <a href="/promedio_movil?tabla=Ingresos" class="btn btn-light btn-sm me-2">Ingresos</a>
+                <a href="/promedio_movil?tabla=Egresos" class="btn btn-secondary btn-sm">Egresos</a>
+            </div>
+        </div>
+        <div class="card-body">
+            <h2 class="h4">{{ titulo }}</h2>
+            <p class="text-muted">{{ descripcion }}</p>
+
+            <form method="get" action="/promedio_movil" class="row g-3 align-items-end">
+                <div class="col-auto">
+                    <label for="tabla" class="form-label">Tabla</label>
+                    <select id="tabla" name="tabla" class="form-select">
+                        <option value="Ingresos" {% if tabla == 'Ingresos' %}selected{% endif %}>Ingresos</option>
+                        <option value="Egresos" {% if tabla == 'Egresos' %}selected{% endif %}>Egresos</option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <label for="ventana" class="form-label">Ventana</label>
+                    <input type="number" min="2" id="ventana" name="ventana" value="{{ ventana }}" class="form-control" />
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">Actualizar</button>
+                </div>
+                <div class="col-12 small text-muted">
+                    Observaciones: {{ n_obs }} | Valores de promedio móvil: {{ n_ma }}
+                </div>
+            </form>
+
+            <div class="mt-4">
+                <canvas id="maChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const anios = {{ anios_json | tojson }};
+    const reales = {{ reales_json | tojson }};
+    const ma = {{ ma_json | tojson }};
+
+    const ctx = document.getElementById('maChart').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: anios,
+            datasets: [
+                {
+                    label: 'Serie original',
+                    data: reales,
+                    borderColor: 'rgba(0, 90, 156, 1)',
+                    backgroundColor: 'rgba(0, 90, 156, 0.1)',
+                    fill: false,
+                    tension: 0.1,
+                    pointRadius: 3
+                },
+                {
+                    label: `Promedio móvil (ventana {{ ventana }})`,
+                    data: ma,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                    fill: false,
+                    tension: 0.1,
+                    pointRadius: 0,
+                    spanGaps: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    title: { display: true, text: 'Año' },
+                    ticks: {
+                        callback: function(value) { return String(value); }
+                    }
+                },
+                y: {
+                    title: { display: true, text: 'Total' },
+                    beginAtZero: false
+                }
+            }
+        }
+    });
+</script>
+</body>
+</html>
